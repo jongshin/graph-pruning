@@ -5,17 +5,15 @@
 
 using myNetwork::Count;
 using myNetwork::Graph;
-using myNetwork::Generator::createERBipartite;
+using myNetwork::Generator::createERNetwork;
 using myNetwork::Traversal::getClusterSizesOfBipartite;
-using Simulation::kPruningBipartite;
+using Simulation::kPruning;
 
 int main (int argc, const char* argv[]) {
     const Count nNodes = std::stoi(argv[1]);
     const double meanDegree = std::stod(argv[2]);
-    const double meanEdgeSize = std::stod(argv[3]);
-    const Count nEns = std::stoi(argv[4]);
-    const Count k = std::stoi(argv[5]);
-    const Count q = std::stoi(argv[6]);
+    const Count nEns = std::stoi(argv[3]);
+    const Count k = std::stoi(argv[4]);
 
     std::ios_base::sync_with_stdio(false);
     std::cout.tie(NULL); std::cin.tie(NULL);
@@ -23,15 +21,14 @@ int main (int argc, const char* argv[]) {
     std::cout << std::scientific;
     std::cout.precision(12);
 
-    const Count nEdges = static_cast<Count>(meanDegree*nNodes/meanEdgeSize);
-    const Count nBipartiteLinks = static_cast<Count>(meanDegree*nNodes);
+    const Count nEdges = static_cast<Count>(meanDegree*nNodes/2.0);
 
     double orderParam = 0, susceptibility = 0;
     double orderParamPruned = 0, susceptibilityPruned = 0;
 
     for(Count i=0; i<nEns; ++i) {
         
-        Graph G = createERBipartite( nNodes, nEdges, nBipartiteLinks);
+        Graph G = createERNetwork( nNodes, nEdges );
 
         vector<Count> clusterSizes = getClusterSizesOfBipartite(G,nNodes);
 
@@ -40,7 +37,7 @@ int main (int argc, const char* argv[]) {
         orderParam += currentM;
         susceptibility += currentM*currentM;
 
-        kPruningBipartite simulator(G,nNodes,k,q);
+        kPruning simulator(G,k);
         simulator.run();
 
         vector<Count> prunedClusterSizes = getClusterSizesOfBipartite(G,nNodes);
@@ -56,7 +53,6 @@ int main (int argc, const char* argv[]) {
     orderParamPruned /= nEns; susceptibilityPruned /= nEns;
 
     std::cout << meanDegree << '\t' 
-    << meanEdgeSize << '\t' 
     << nEns << '\t' 
     << orderParam << '\t' 
     << (susceptibility - (orderParam*orderParam))*nNodes << '\t' 
