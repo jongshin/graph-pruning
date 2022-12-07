@@ -1,3 +1,7 @@
-# StatPhys
+# Graph pruning
 
-My own libraries for solving diverse problems of statistical physics. Especially on the network science and the Monte Carlo simulations.
+My own libraries for solving pruning problems of network science.
+
+#### Compile
+
+#### Usage
